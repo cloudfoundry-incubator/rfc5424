@@ -67,7 +67,7 @@ func (m *Message) AddDatum(ID string, Name string, Value string) {
 	m.StructuredData = append(m.StructuredData, StructuredData{
 		ID: ID,
 		Parameters: []SDParam{
-			SDParam{
+			{
 				Name:  Name,
 				Value: Value,
 			},

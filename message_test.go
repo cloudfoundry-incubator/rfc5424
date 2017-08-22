@@ -12,10 +12,10 @@ func (s *MessageTest) TestAddDatum(c *C) {
 	m.AddDatum("id", "name", "value")
 	c.Assert(m, DeepEquals, Message{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID: "id",
 				Parameters: []SDParam{
-					SDParam{"name", "value"},
+					{"name", "value"},
 				},
 			},
 		},
@@ -24,16 +24,16 @@ func (s *MessageTest) TestAddDatum(c *C) {
 	m.AddDatum("id2", "name", "value")
 	c.Assert(m, DeepEquals, Message{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID: "id",
 				Parameters: []SDParam{
-					SDParam{"name", "value"},
+					{"name", "value"},
 				},
 			},
-			StructuredData{
+			{
 				ID: "id2",
 				Parameters: []SDParam{
-					SDParam{"name", "value"},
+					{"name", "value"},
 				},
 			},
 		},
@@ -42,17 +42,17 @@ func (s *MessageTest) TestAddDatum(c *C) {
 	m.AddDatum("id", "name2", "value2")
 	c.Assert(m, DeepEquals, Message{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID: "id",
 				Parameters: []SDParam{
-					SDParam{"name", "value"},
-					SDParam{"name2", "value2"},
+					{"name", "value"},
+					{"name2", "value2"},
 				},
 			},
-			StructuredData{
+			{
 				ID: "id2",
 				Parameters: []SDParam{
-					SDParam{"name", "value"},
+					{"name", "value"},
 				},
 			},
 		},
@@ -61,18 +61,18 @@ func (s *MessageTest) TestAddDatum(c *C) {
 	m.AddDatum("id", "name", "value3")
 	c.Assert(m, DeepEquals, Message{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID: "id",
 				Parameters: []SDParam{
-					SDParam{"name", "value"},
-					SDParam{"name2", "value2"},
-					SDParam{"name", "value3"},
+					{"name", "value"},
+					{"name2", "value2"},
+					{"name", "value3"},
 				},
 			},
-			StructuredData{
+			{
 				ID: "id2",
 				Parameters: []SDParam{
-					SDParam{"name", "value"},
+					{"name", "value"},
 				},
 			},
 		},

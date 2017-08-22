@@ -62,18 +62,18 @@ var testCases = []struct {
 		AppName:   "evntslog",
 		MessageID: "ID47",
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID: "exampleSDID@32473",
 				Parameters: []SDParam{
-					SDParam{
+					{
 						Name:  "iut",
 						Value: "3",
 					},
-					SDParam{
+					{
 						Name:  "eventSource",
 						Value: "Application",
 					},
-					SDParam{
+					{
 						Name:  "eventID",
 						Value: "1011",
 					},
@@ -91,27 +91,27 @@ var testCases = []struct {
 		AppName:   "evntslog",
 		MessageID: "ID47",
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID: "exampleSDID@32473",
 				Parameters: []SDParam{
-					SDParam{
+					{
 						Name:  "iut",
 						Value: "3",
 					},
-					SDParam{
+					{
 						Name:  "eventSource",
 						Value: "Application",
 					},
-					SDParam{
+					{
 						Name:  "eventID",
 						Value: "1011",
 					},
 				},
 			},
-			StructuredData{
+			{
 				ID: "examplePriority@32473",
 				Parameters: []SDParam{
-					SDParam{
+					{
 						Name:  "class",
 						Value: "high",
 					},
@@ -123,10 +123,10 @@ var testCases = []struct {
 	{Message{
 		Timestamp: T("2003-08-24T05:14:15.000003-07:00"),
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID: "x@1",
 				Parameters: []SDParam{
-					SDParam{
+					{
 						Name:  "class",
 						Value: `backslash=\ quote=" right bracket=] left bracket=[`,
 					},
@@ -143,10 +143,10 @@ var testCases = []struct {
 	{Message{
 		Timestamp: T("2003-08-24T05:14:15.000003-07:00"),
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID: "x@1",
 				Parameters: []SDParam{
-					SDParam{
+					{
 						Name:  "",
 						Value: "value",
 					},
@@ -241,77 +241,77 @@ func (s *MarshalTest) TestFailsToUnmarshalInvalidStrings(c *C) {
 }
 
 var invalidMessages = []Message{
-	Message{Hostname: "\x7f"},
-	Message{Hostname: "\x20"},
-	Message{Hostname: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
+	{Hostname: "\x7f"},
+	{Hostname: "\x20"},
+	{Hostname: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 		"AAAAAA",
 	},
-	Message{AppName: "\x7f"},
-	Message{AppName: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
-	Message{ProcessID: "\x7f"},
-	Message{ProcessID: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
+	{AppName: "\x7f"},
+	{AppName: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
+	{ProcessID: "\x7f"},
+	{ProcessID: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
 		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 	},
-	Message{MessageID: "\x7f"},
-	Message{MessageID: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
-	Message{
+	{MessageID: "\x7f"},
+	{MessageID: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},
+	{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID:         "\x20",
-				Parameters: []SDParam{SDParam{Name: "", Value: "value"}},
+				Parameters: []SDParam{{Name: "", Value: "value"}},
 			},
 		},
 	},
-	Message{
+	{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID:         "\x7f",
-				Parameters: []SDParam{SDParam{Name: "", Value: "value"}},
+				Parameters: []SDParam{{Name: "", Value: "value"}},
 			},
 		},
 	},
-	Message{
+	{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID:         "foo=bar",
-				Parameters: []SDParam{SDParam{Name: "", Value: "value"}},
+				Parameters: []SDParam{{Name: "", Value: "value"}},
 			},
 		},
 	},
-	Message{
+	{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID:         "foo[bar]",
-				Parameters: []SDParam{SDParam{Name: "", Value: "value"}},
+				Parameters: []SDParam{{Name: "", Value: "value"}},
 			},
 		},
 	},
-	Message{
+	{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID:         `foo"bar`,
-				Parameters: []SDParam{SDParam{Name: "", Value: "value"}},
+				Parameters: []SDParam{{Name: "", Value: "value"}},
 			},
 		},
 	},
-	Message{
+	{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID:         `x@1`,
-				Parameters: []SDParam{SDParam{Name: "\x7f", Value: "value"}},
+				Parameters: []SDParam{{Name: "\x7f", Value: "value"}},
 			},
 		},
 	},
-	Message{
+	{
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID:         `x@1`,
-				Parameters: []SDParam{SDParam{Name: "x", Value: "\xc3\x28"}},
+				Parameters: []SDParam{{Name: "x", Value: "\xc3\x28"}},
 			},
 		},
 	},
@@ -335,9 +335,9 @@ func (s *MarshalTest) TestLongAttributes(c *C) {
 	m := Message{
 		Timestamp: T("2003-08-24T05:14:15.000003-07:00"),
 		StructuredData: []StructuredData{
-			StructuredData{
+			{
 				ID:         "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-				Parameters: []SDParam{SDParam{Name: "", Value: "value"}},
+				Parameters: []SDParam{{Name: "", Value: "value"}},
 			},
 		},
 	}
