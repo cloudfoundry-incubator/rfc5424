@@ -13,7 +13,15 @@ type MarshalTest struct {
 }
 
 func T(s string) time.Time {
-	rv, err := time.Parse(time.RFC3339Nano, s)
+	rv, err := time.Parse(RFC5424TimeOffsetNum, s)
+	if err != nil {
+		panic(err)
+	}
+	return rv
+}
+
+func UTC(s string) time.Time {
+	rv, err := time.Parse(RFC5424TimeOffsetUTC, s)
 	if err != nil {
 		panic(err)
 	}
@@ -27,13 +35,13 @@ var testCases = []struct {
 	// RFC-5424 Example 1
 	{Message{
 		Priority:       34,
-		Timestamp:      T("2003-10-11T22:14:15.003Z"),
+		Timestamp:      T("2003-08-24T05:14:15.000003-07:00"),
 		Hostname:       "mymachine.example.com",
 		AppName:        "su",
 		MessageID:      "ID47",
 		StructuredData: []StructuredData{},
 		Message:        []byte("'su root' failed for lonvick on /dev/pts/8"),
-	}, `<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - 'su root' failed for lonvick on /dev/pts/8`},
+	}, `<34>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com su - ID47 - 'su root' failed for lonvick on /dev/pts/8`},
 
 	// RFC-5424 Example 2
 	{Message{
@@ -49,7 +57,7 @@ var testCases = []struct {
 	// RFC-5424 Example 3
 	{Message{
 		Priority:  165,
-		Timestamp: T("2003-10-11T22:14:15.003Z"),
+		Timestamp: T("2003-08-24T05:14:15.000003-07:00"),
 		Hostname:  "mymachine.example.com",
 		AppName:   "evntslog",
 		MessageID: "ID47",
@@ -73,12 +81,12 @@ var testCases = []struct {
 			},
 		},
 		Message: []byte("An application event log entry..."),
-	}, `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"] An application event log entry...`},
+	}, `<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"] An application event log entry...`},
 
 	// RFC-5424 Example 4
 	{Message{
 		Priority:  165,
-		Timestamp: T("2003-10-11T22:14:15.003Z"),
+		Timestamp: T("2003-08-24T05:14:15.000003-07:00"),
 		Hostname:  "mymachine.example.com",
 		AppName:   "evntslog",
 		MessageID: "ID47",
@@ -110,10 +118,10 @@ var testCases = []struct {
 				},
 			},
 		},
-	}, `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`},
+	}, `<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"]`},
 
 	{Message{
-		Timestamp: T("0000-12-31T00:00:00Z"),
+		Timestamp: T("2003-08-24T05:14:15.000003-07:00"),
 		StructuredData: []StructuredData{
 			StructuredData{
 				ID: "x@1",
@@ -125,15 +133,15 @@ var testCases = []struct {
 				},
 			},
 		},
-	}, `<0>1 0000-12-31T00:00:00Z - - - - [x@1 class="backslash=\\ quote=\" right bracket=\] left bracket=["]`},
+	}, `<0>1 2003-08-24T05:14:15.000003-07:00 - - - - [x@1 class="backslash=\\ quote=\" right bracket=\] left bracket=["]`},
 
 	{Message{
-		Timestamp:      T("0000-12-31T00:00:00Z"),
+		Timestamp:      T("2003-08-24T05:14:15.000003-07:00"),
 		StructuredData: []StructuredData{},
-	}, `<0>1 0000-12-31T00:00:00Z - - - - -`},
+	}, `<0>1 2003-08-24T05:14:15.000003-07:00 - - - - -`},
 
 	{Message{
-		Timestamp: T("0000-12-31T00:00:00Z"),
+		Timestamp: T("2003-08-24T05:14:15.000003-07:00"),
 		StructuredData: []StructuredData{
 			StructuredData{
 				ID: "x@1",
@@ -145,7 +153,7 @@ var testCases = []struct {
 				},
 			},
 		},
-	}, `<0>1 0000-12-31T00:00:00Z - - - - [x@1 ="value"]`},
+	}, `<0>1 2003-08-24T05:14:15.000003-07:00 - - - - [x@1 ="value"]`},
 }
 
 func (s *MarshalTest) TestCanMarshalAndUnmarshal(c *C) {
@@ -169,8 +177,14 @@ func (s *MarshalTest) TestCanMarshalAndUnmarshal(c *C) {
 // make sure they are valid to we know our tests are sensitive the way we want
 // them to be.
 var validStrings = [][]byte{
-	[]byte(`<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su X ID47 - msg`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [id name="value"]`),
+	[]byte(`<34>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com su X ID47 - msg`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [id name="value"]`),
+	[]byte(`<165>1 2003-08-24T05:14:15.003-07:00 mymachine.example.com evntslog - ID47 [id name="value"]`),
+	[]byte(`<165>1 2003-08-24T05:14:15-07:00 mymachine.example.com evntslog - ID47 [id name="value"]`),
+	[]byte(`<165>1 2003-08-24T05:14:15Z mymachine.example.com evntslog - ID47 [id name="value"]`),
+	[]byte(`<165>1 2003-08-24T05:14:15.00Z mymachine.example.com evntslog - ID47 [id name="value"]`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003Z mymachine.example.com evntslog - ID47 [id name="value"]`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003+07:00 mymachine.example.com evntslog - ID47 [id name="value"]`),
 }
 
 var invalidStrings = [][]byte{
@@ -180,37 +194,40 @@ var invalidStrings = [][]byte{
 	[]byte(`<34>`),
 	[]byte(`<34>1`),
 	[]byte(`<34>1 `),
-	[]byte(`<34>1 2003-10-11T22:14:15.003Z`),
-	[]byte(`<34>1 2003-10-11T22:14:15.003Z `),
-	[]byte(`<34>1 2003-10-11T22:14:15.003Z mymachine.example.com`),
-	[]byte(`<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su`),
-	[]byte(`<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su X`),
-	[]byte(`<34>1 2003-10-11T22:14:15.003Z mymachine.example.com su X ID47`),
-	[]byte(`<F>1 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - msg`),
-	[]byte(`<34>X 2003-10-11T22:14:15.003Z mymachine.example.com su - ID47 - msg`),
+	[]byte(`<34>1 2003-08-24T05:14:15.000003-07:00`),
+	[]byte(`<34>1 2003-08-24T05:14:15.000003-07:00`),
+	[]byte(`<34>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com`),
+	[]byte(`<34>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com su`),
+	[]byte(`<34>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com su X`),
+	[]byte(`<34>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com su X ID47`),
+	[]byte(`<F>1 2003-08-24T05:14:15.000003-07:00 mymachi mymachine.example.com su - ID47 - msg`),
+	[]byte(`<34>X 2003-08-24T05:14:15.000003-07:00 mymachine.example.com su - ID47 - msg`),
 	[]byte(`<34>1 notATimestamp mymachine.example.com su - ID47 - 'su root' failed for lonvick on /dev/pts/8`),
-	[]byte(`>34<1 2003-10-11T22:14:15.003Z mymachine.example.com su X ID47 - msg`),
-	[]byte(`<3499999999999999999999999999999999>1 2003-10-11T22:14:15.003Z mymachine.example.com su X ID47 - msg`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 `),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 ]`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [id`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [id name=`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [id name="]`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [id name="value`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [id name="value"`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [id name="value"x]`),
-	[]byte(`<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [id name="value\`),
+	[]byte(`>34<1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com su X ID47 - msg`),
+	[]byte(`<3499999999999999999999999999999999>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com su X ID47 - msg`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 `),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 ]`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [id`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [id name=`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [id name="]`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [id name="value`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [id name="value"`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [id name="value"x]`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003-07:00 mymachine.example.com evntslog - ID47 [id name="value\`),
+	[]byte(`<165>1 2003-08-24T05:14:15.000003Z+07:00 mymachine.example.com evntslog - ID47 [id name="value"]`),
 }
 
-func (s *MarshalTest) TestCannotUnmarshalBrokenStrings(c *C) {
+func (s *MarshalTest) TestUnmarshalValidStrings(c *C) {
 	for _, actual := range validStrings {
 		m := Message{}
 		err := m.UnmarshalBinary(actual)
 		c.Assert(err, IsNil)
 	}
+}
 
+func (s *MarshalTest) TestFailsToUnmarshalInvalidStrings(c *C) {
 	for _, actual := range invalidStrings {
 		m := Message{}
 		err := m.UnmarshalBinary(actual)
@@ -316,6 +333,7 @@ func (s *MarshalTest) TestCannotMarshalInvalidMessages(c *C) {
 func (s *MarshalTest) TestLongAttributes(c *C) {
 
 	m := Message{
+		Timestamp: T("2003-08-24T05:14:15.000003-07:00"),
 		StructuredData: []StructuredData{
 			StructuredData{
 				ID:         "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -326,7 +344,7 @@ func (s *MarshalTest) TestLongAttributes(c *C) {
 	bin, err := m.MarshalBinary()
 	if allowLongSdNames {
 		c.Assert(err, IsNil)
-		c.Assert(string(bin), Equals, "<0>1 0001-01-01T00:00:00Z - - - - [AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA =\"value\"]")
+		c.Assert(string(bin), Equals, "<0>1 2003-08-24T05:14:15.000003-07:00 - - - - [AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA =\"value\"]")
 	} else {
 		c.Assert(err, Not(IsNil))
 		c.Assert(fmt.Sprintf("%s", err), Not(Equals), "")

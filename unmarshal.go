@@ -200,11 +200,18 @@ func (m *Message) readTimestamp(r io.RuneScanner) error {
 	if err != nil {
 		return err
 	}
-	m.Timestamp, err = time.Parse(time.RFC3339, timestampString)
-	if err != nil {
-		return err
+
+	m.Timestamp, err = time.Parse(RFC5424TimeOffsetNum, timestampString)
+	if err == nil {
+		return nil
 	}
-	return nil
+
+	m.Timestamp, err = time.Parse(RFC5424TimeOffsetUTC, timestampString)
+	if err == nil {
+		return nil
+	}
+
+	return err
 }
 
 func (m *Message) readHostname(r io.RuneScanner) (err error) {
@@ -438,8 +445,8 @@ func readWord(r io.RuneScanner) (string, error) {
 	}
 }
 
-func copyFrom(in []byte ) []byte {
-	out := make([]byte,len(in))
+func copyFrom(in []byte) []byte {
+	out := make([]byte, len(in))
 	copy(out, in)
 	return out
 }

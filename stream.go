@@ -16,6 +16,7 @@ func (m Message) WriteTo(w io.Writer) (int64, error) {
 		return 0, err
 	}
 	n, err := fmt.Fprintf(w, "%d %s", len(b), b)
+
 	return int64(n), err
 }
 

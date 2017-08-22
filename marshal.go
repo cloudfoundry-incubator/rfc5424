@@ -3,13 +3,20 @@ package rfc5424
 import (
 	"bytes"
 	"fmt"
-	"time"
 	"unicode/utf8"
 )
 
 // allowLongSdNames is true to allow names longer than the RFC-specified limit
 // of 32-characters. (When true, this violates RFC-5424).
 const allowLongSdNames = true
+
+// RFC5424TimeOffsetNum is the timestamp defined by RFC-5424 with the
+// NUMOFFSET instead of Z.
+const RFC5424TimeOffsetNum = "2006-01-02T15:04:05.999999-07:00"
+
+// RFC5424TimeOffsetUTC is the timestamp defined by RFC-5424 with the offset
+// set to 0 for UTC.
+const RFC5424TimeOffsetUTC = "2006-01-02T15:04:05.999999Z"
 
 // ErrInvalidValue is returned when a log message cannot be emitted because one
 // of the values is invalid.
@@ -146,7 +153,7 @@ func (m Message) MarshalBinary() ([]byte, error) {
 	b := bytes.NewBuffer(nil)
 	fmt.Fprintf(b, "<%d>1 %s %s %s %s %s ",
 		m.Priority,
-		m.Timestamp.Format(time.RFC3339Nano),
+		m.Timestamp.Format(RFC5424TimeOffsetNum),
 		nilify(m.Hostname),
 		nilify(m.AppName),
 		nilify(m.ProcessID),
