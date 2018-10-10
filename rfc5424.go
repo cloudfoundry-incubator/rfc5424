@@ -29,6 +29,10 @@ const (
 	Cron
 	Authpriv
 	Ftp
+	Ntp
+	Security
+	Console
+	Solaris-cron
 	Local0
 	Local1
 	Local2
